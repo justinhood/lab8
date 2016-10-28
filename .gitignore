@@ -26,7 +26,3 @@ Prerequisites
 *.a
 *.lib
 
-# Executables
-*.exe
-*.out
-*.app

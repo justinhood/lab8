@@ -38,6 +38,8 @@ using namespace std;
 
 
 // GLOBAL VARIABLES ////////////////////////////////////////////////////////////
+	GLuint brickTex;
+	GLuint texHandle;
 
 //global variables to keep track of window width and height.
 //set to initial values for convenience, but we need variables
@@ -249,7 +251,8 @@ void renderScene(void) {
 	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, ambCol );
 
     // TODO #3: Apply our brick texture
-    
+	glEnable(GL_TEXTURE_2D);
+ 	glBindTexture(GL_TEXTURE_2D, texHandle);
     glPushMatrix(); {
         glTranslatef(objX, objY, objZ);
         
@@ -332,15 +335,31 @@ void renderScene(void) {
 					glutSolidDodecahedron();
 				break;
                 
-            case OTHER:
-                // TODO #4: make a quad
-                
-                break;
+            		case OTHER:
+               		 // TODO #4: make a quad
+                		glBegin(GL_QUADS);
+				
+				glTexCoord2f (0.0, 0.0);
+				glNormal3f(0,0,1);
+				glVertex3f(-1,-1,0);
+		
+				glTexCoord2f (2.0, 0.0);
+				glNormal3f(0,0,1);
+				glVertex3f(1,-1,0);
+
+				glTexCoord2f (2.0, 2.0);
+				glNormal3f(0,0,1);
+				glVertex3f(1,1,0);
+
+				glTexCoord2f (0.0, 2.0);
+				glNormal3f(0,0,1);
+				glVertex3f(-1,1,0);
+               		 break;
 		};
 		gluDeleteQuadric( myQuad );
-	
-    }; glPopMatrix();
 
+    }; glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
     //scale the axes up so they stick through the dodecahedron
     glPushMatrix();
         glScalef(4,4,4);
@@ -636,7 +655,18 @@ bool registerOpenGLTexture(unsigned char *textureData,
                            unsigned int texWidth, unsigned int texHeight,
                            GLuint &textureHandle) {
     // TODO #2b: Fill this in
-    
+	glEnable(GL_TEXTURE_2D);
+	glGenTextures(2,&textureHandle);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0,
+GL_RGB, GL_UNSIGNED_BYTE, textureData);
+	glDisable(GL_TEXTURE_2D); 
     return true;
 }
 
@@ -688,16 +718,22 @@ int main(int argc, char **argv) {
 		exit(0);
 	}	
     // TODO #2a: Register PPM Texture
-	GLuint tex;
-	//glGenTextures(1, &tex);
-	bool textures=registerOpenGLTexture(imageData, width, height, tex);
+	bool textures=registerOpenGLTexture(imageData, width, height, brickTex);
     	if(!textures){
 		printf("Failed to texture");
 		exit(0);
 	}
     // TODO #5: Read in non-PPM
-    // TODO #6: Register non-PPM
-    
+   	texHandle=SOIL_load_OGL_texture("./textures/mines.png",SOIL_LOAD_AUTO,SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
+	 // TODO #6: Register non-PPM
+
+
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	
 	// register our timer function
     glutTimerFunc((unsigned int)(1000.0 / 60.0), myTimer, 0);
 
