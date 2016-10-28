@@ -683,12 +683,18 @@ int main(int argc, char **argv) {
 	int height=375;
 	unsigned char* imageData;
 	bool reads=readPPM("./textures/brick.ppm",width, height, imageData);	
-	printf("%d\n", reads);
+	if(!reads){
+		printf("Failed to read in input file");
+		exit(0);
+	}	
     // TODO #2a: Register PPM Texture
-	bool registerOpenGLTexture(imageData,
-                           width, height,
-                           GLuint &textureHandle)
-    
+	GLuint tex;
+	//glGenTextures(1, &tex);
+	bool textures=registerOpenGLTexture(imageData, width, height, tex);
+    	if(!textures){
+		printf("Failed to texture");
+		exit(0);
+	}
     // TODO #5: Read in non-PPM
     // TODO #6: Register non-PPM
     
